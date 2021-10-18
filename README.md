@@ -38,7 +38,7 @@ When downloading protected resources (steps C and D), the access token must be p
 
 Bailsman base URL:
 - production environment (https://bailsman.co)
-- demo environment (https://bailsman-staging.herokuapp.com)
+- demo environment (https://bailsman-demo-app.herokuapp.com)
 
 * ### Credentials for your application
 
@@ -96,4 +96,4 @@ The response body that comes back looks like this:
 
 You can find available endpoints here:
 
-https://bailsman-staging.herokuapp.com/documentation
+https://bailsman-demo-app.herokuapp.com/documentation
