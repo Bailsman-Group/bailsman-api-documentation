@@ -32,7 +32,7 @@ To describe the process, we'll use this diagram taken from RFC 6749 (the officia
 
 In step A, we ask the authorization server to grant authorization to our client. The authorization server should prompt the user for recognition of this application; if granted, then access and refresh tokens are issued. The access token has a time-to-live value associated with it.
 
-When downloading protected resources (steps C and D), the access token must be presented. If an expired or invalid token is presented, it will be rejected.
+When downloading protected resources (steps C and D), the access token must be presented. If an expired or invalid token is presented, it will be rejected (steps E and F). Then you should attempt a refresh (step G.) If the refresh fails, you should start over from step A.
 
 * ### Bailsman base URL
 
@@ -67,18 +67,34 @@ The response body that comes back looks like this:
 {
     "access_token": "BLTl6Oo3s6L8tKnL1XJcKTaKPwF....",
     "token_type": "Bearer",
+    "expires_in": 7200,
+    "refresh_token": "Vz26qmPy99RKWp_nFFBXm9T4IhtP0n5M7skIdRFrs94",
     "scope": "write",
-    "created_at": 1634130066
+    "created_at": 1636019770
 }
 ```
 
-You can now make requests to the API with the access token returned.
+You can now make requests to the API with the access token returned. 
+The `access_token` is what is needed to set in all HTTP headers; it will expire in `expires_in` seconds. Once that period has passed, you should use the `refresh_token` to get a new `access_token`. To keep from re-authorizing each time the app runs, the `refresh_token` should be persisted somewhere.
 
 * ### Using the Access Token
 
 For each request to access a protected resource, you will want to add this HTTP header:
 `Authorization: Bearer BLTl6Oo3s6L8tKnL1XJcKTaKPwF...`
 And thus the access will be granted.
+Access token expiration time is 2 hours. Then you need to refresh access token. 
+
+* ### Refresh the Access Token
+
+When you need to refresh access token, you should make a `POST` request very similar to the one following the authorization grant (`BASE_URL/oauth/token`). Only a few values are different, marked in bold:
+
+- `client_id`: The client ID issued in the first step.
+- `client_secret`: The client secret issued in the first step.
+- `redirect_uri`: The callback URI you defined previously.
+- **`grant_type`: This was authorization_code in the initial request, but now it'll be `refresh_token`.**
+- **`refresh_token`: The saved refresh token.**
+
+You will get new access token for landlord in the response.
 
 * ### Revoking Access
 
